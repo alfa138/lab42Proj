@@ -1,0 +1,41 @@
+<div class="row" *ngIf="(beers$ | async) as beers">
+
+    <div class="col-12 d-flex justify-content-center mb-3">
+
+        <form class="d-flex" role="search" [formGroup]="foodPairForm" (ngSubmit)="formSubmitHandle()">
+            <input class="form-control me-2" type="search" placeholder="*Food pair" aria-label="Search"
+                   formControlName="food">
+            <button class="btn btn-outline-success" type="submit" [disabled]="foodPairForm.invalid">Search</button>
+            <button class="btn btn-outline-info ms-2" type="button" [disabled]="foodPairForm.invalid"
+                    (click)="resetForm()">Reset
+            </button>
+        </form>
+
+    </div>
+
+    <div class="col-md-4 mb-4" *ngFor="let beer of beers; index as index; trackBy: trackByFn">
+
+        <app-beer-card [beer]="beer" (click)="openDialog(beer)" role="button" tabindex="0"></app-beer-card>
+
+    </div>
+
+    <div class="col-12 mb-4">
+
+        <nav class="d-flex align-items-center justify-content-around">
+
+            <button type="button" class="btn btn-primary" (click)="prevPage()" [disabled]="currentPage === MIN_PAGE">
+                Prev page
+            </button>
+
+            <p>Page {{currentPage}}/{{MAX_PAGE}}</p>
+
+            <button type="button" class="btn btn-success" (click)="nextPage()"
+                    [disabled]="(currentPage === MAX_PAGE) || (beers.length < PER_PAGE)">
+                Next page
+            </button>
+
+        </nav>
+
+    </div>
+
+</div>

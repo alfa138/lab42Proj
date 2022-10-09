@@ -1,0 +1,28 @@
+<div class="beer-card">
+
+    <img [src]="beer.image_url" alt="Beer" class="img-fluid beer-image">
+
+    <div class="container">
+
+        <mat-form-field *ngIf="showRank" class="position-2" appearance="outline" (click)="$event.stopPropagation()">
+            <mat-label>Rank</mat-label>
+            <mat-select (selectionChange)="changeRank($event)" [formControl]="rank">
+                <mat-option [value]="1">1</mat-option>
+                <mat-option [value]="2">2</mat-option>
+                <mat-option [value]="3">3</mat-option>
+                <mat-option [value]="4">4</mat-option>
+                <mat-option [value]="5">5</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <h4 class="font-weight-bold m-0">{{beer.name}}</h4>
+
+        <mat-slide-toggle color="accent" class="position-1" (change)="sliderChanged($event)"
+                          [checked]="beer.favorite | async"
+                          (click)="$event.stopPropagation()"
+                          [matTooltip]="(beer.favorite | async) ? 'Remove from favorites' : 'Add to favorites'"
+                          matTooltipPosition="above"></mat-slide-toggle>
+
+    </div>
+
+</div>

@@ -1,0 +1,13 @@
+.beer-card {
+    display       : flex;
+    border        : 1px solid lightgray;
+    border-radius : 5px;
+    padding       : 1.5rem;
+    height        : 100%;
+    align-items   : center;
+    position      : relative;
+
+    .beer-image {
+        width : 3rem;
+    }
+}

@@ -1,0 +1,46 @@
+<ng-container *ngIf="!(beers$ | async).length; else hasFavoriteBeers">
+    <p class="text-center">Sorry mate, you have no favorite beers!</p>
+</ng-container>
+
+<ng-template #hasFavoriteBeers>
+
+    <div class="row">
+
+        <div class="col-12 mb-4">
+
+            <button type="button" class="btn btn-outline-danger"
+                    (click)="removeAllFavoritesModal(removeAllFavoritesModalRef)">
+                Remove all favorites
+            </button>
+
+        </div>
+
+        <div class="col-md-4 mb-4" *ngFor="let beer of beers$ | async; index as index; trackBy: trackByFn">
+
+            <app-beer-card [beer]="beer" [showRank]="true" (click)="openDialog(beer)" role="button"
+                           tabindex="0"></app-beer-card>
+
+        </div>
+
+    </div>
+
+</ng-template>
+
+<ng-template #removeAllFavoritesModalRef>
+
+    <div>
+
+        <p class="mb-3 text-center">Delete all beers?</p>
+
+        <div class="d-flex align-items-center justify-content-around">
+
+            <button type="button" class="btn btn-primary" mat-dialog-close="true" (click)="removeAllFavorites()">Yes
+            </button>
+
+            <button type="button" class="btn btn-outline-primary" mat-dialog-close="true">No</button>
+
+        </div>
+
+    </div>
+
+</ng-template>
