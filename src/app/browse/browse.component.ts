@@ -89,4 +89,5 @@ export class BrowseComponent implements OnInit {
         this.beers$ = this.beerService.getBeers(1);
     }
     
+    
 }
