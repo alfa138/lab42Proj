@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {Beer} from "../models";
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Beer, LocalStorageKeys} from "../models";
 import {BeerService, BeerStoreService} from "../services";
-import {Observable} from "rxjs";
+import {from, Observable, of} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {BeerModalComponent} from "../beer-modal/beer-modal.component";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -11,7 +11,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
     templateUrl: './browse.component.html',
     styleUrls: ['./browse.component.scss']
 })
-export class BrowseComponent implements OnInit {
+export class BrowseComponent implements OnInit, OnDestroy {
     beers$: Observable<Beer[]>;
     currentPage;
     readonly MIN_PAGE = 1;
@@ -30,6 +30,14 @@ export class BrowseComponent implements OnInit {
         });
         
         this.listenToCurrentPage();
+        
+        const localStorageBeers = localStorage.getItem(LocalStorageKeys.BEERS);
+        if (localStorageBeers) {
+            this.currentPage = +localStorage.getItem(LocalStorageKeys.PAGE);
+            this.beers$ = of(JSON.parse(localStorageBeers)) as Observable<Beer[]>;
+            return;
+        }
+        
         this.beers$ = this.beerService.getBeers(this.currentPage);
     }
     
@@ -64,9 +72,9 @@ export class BrowseComponent implements OnInit {
         if (this.currentPage <= this.MIN_PAGE) {
             return;
         }
-    
+        
         const food = this.foodPairForm.get('food').value;
-    
+        
         this.beerStoreService.currentPage.next(--this.currentPage);
         this.beers$ = this.beerService.getBeers(this.currentPage, 12, food ?? null);
     }
@@ -87,6 +95,19 @@ export class BrowseComponent implements OnInit {
         
         this.beerStoreService.currentPage.next(1);
         this.beers$ = this.beerService.getBeers(1);
+    }
+    
+    async setCacheData() {
+        // set beers
+        const localStorageBeers = await this.beerService.setLocal(this.beers$);
+        localStorage.setItem(LocalStorageKeys.BEERS, JSON.stringify(localStorageBeers));
+        
+        // set current page
+        localStorage.setItem(LocalStorageKeys.PAGE, this.currentPage);
+    }
+    
+    ngOnDestroy() {
+        this.setCacheData();
     }
     
 }

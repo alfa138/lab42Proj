@@ -1,19 +1,28 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
-import {Beer} from "../models";
-import {catchError, EMPTY, map, mergeMap, of, tap} from "rxjs";
+import {Beer, LocalStorageKeys} from "../models";
+import {catchError, EMPTY, firstValueFrom, map, mergeMap, Observable, of, tap} from "rxjs";
 import {BeerStoreService} from "./beer-store.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class BeerService {
+    beersFromCache = true;
     
     constructor(private http: HttpClient, private beerStoreService: BeerStoreService) {
     }
     
     getBeers(page = 1, perPage = 12, food = null) {
+        const beersCache = localStorage.getItem(LocalStorageKeys.BEERS);
+        
+        if (this.beersFromCache && beersCache) {
+            this.beersFromCache = false;
+            console.log(JSON.parse(localStorage.getItem(LocalStorageKeys.BEERS)));
+            return of(JSON.parse(localStorage.getItem(LocalStorageKeys.BEERS))) as Observable<Beer[]>;
+        }
+        
         const extraUrl = food ? `&food=${food}` : '';
         console.log(`${environment.apiUrl}/beers?page=${page}&per_page=${perPage}${extraUrl}`);
         return this.http.get<any[]>(`${environment.apiUrl}/beers?page=${page}&per_page=${perPage}${extraUrl}`)
@@ -54,5 +63,9 @@ export class BeerService {
                     return EMPTY;
                 })
             );
+    }
+    
+    async setLocal(value: Observable<any>): Promise<any> {
+        return await firstValueFrom(value);
     }
 }
